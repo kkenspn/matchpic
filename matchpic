@@ -1,0 +1,51 @@
+import os
+import shutil
+
+def get_filenames(directory, extension):
+    """
+    Get filenames with a specific extension in a directory.
+    """
+    filenames = []
+    for filename in os.listdir(directory):
+        if filename.endswith(extension):
+            filenames.append(filename)
+    return filenames
+
+def find_matching_filenames(picture_dir, text_dir, output_dir):
+    """
+    Find matching filenames between picture files and text files in different directories.
+    Save the matching filenames to an output directory.
+    """
+    picture_files = get_filenames(picture_dir, '.jpg')  # Change extension as needed
+    text_files = get_filenames(text_dir, '.txt')  # Change extension as needed
+    
+    matching_filenames = []
+    for picture_file in picture_files:
+        picture_name = os.path.splitext(picture_file)[0]
+        for text_file in text_files:
+            text_name = os.path.splitext(text_file)[0]
+            if picture_name == text_name:
+                matching_filenames.append((picture_file, text_file))
+                break  # Once matched, no need to check further
+    
+    # Create output directory if it doesn't exist
+    os.makedirs(output_dir, exist_ok=True)
+    
+    # Save matching filenames to output directory
+    for picture, text in matching_filenames:
+        picture_path = os.path.join(output_dir, picture)
+        text_path = os.path.join(output_dir, text)
+        shutil.copy(os.path.join(picture_dir, picture), picture_path)
+        shutil.copy(os.path.join(text_dir, text), text_path)
+    
+    return matching_filenames
+
+# Example usage:
+picture_directory = 'path/to/pictures'
+text_directory = 'path/to/texts'
+output_directory = 'path/to/output'
+
+matching_files = find_matching_filenames(picture_directory, text_directory, output_directory)
+print("Matching files:")
+for picture, text in matching_files:
+    print(f"Picture file: {picture}, Text file: {text}")
